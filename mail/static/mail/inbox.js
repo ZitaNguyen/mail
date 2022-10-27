@@ -35,7 +35,7 @@ function send_email() {
     body: JSON.stringify({
       recipients: document.querySelector('#compose-recipients').value,
       subject: document.querySelector('#compose-subject').value,
-      body: document.querySelector('#compose-body').value
+      body: document.querySelector('#compose-body').value.replace(/\n/g, '<br>\n')
     })
   })
   .then(response => load_mailbox('sent'));
@@ -123,5 +123,24 @@ function load_email(email, mailbox) {
 			})
 			.then(response => load_mailbox('inbox'));
 		});
+
+    // Create button Reply
+		let button_reply = document.createElement('button');
+		button_reply.innerHTML = 'Reply';
+		email_content.appendChild(button_reply);
+		button_reply.addEventListener('click', event => {
+			compose_email();
+
+			document.querySelector('#compose-recipients').value = email['sender'];
+			document.querySelector('#compose-subject').value =
+			email['subject'].includes('Re:')
+			? email['subject']
+			: `Re: ${email['subject']}`;
+			document.querySelector('#compose-body').value =
+			`\nOn ${email['timestamp']} ${email['sender']} wrote: \n${email['body']}`;
+		})
+
+		// CSS buttons
+		button_archive.className = button_reply.className = 'btn btn-primary mx-1 mt-5';
   }
 }
