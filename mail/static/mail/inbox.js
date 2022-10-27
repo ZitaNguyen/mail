@@ -23,22 +23,18 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 
   // Write and send email, then return to Sent mailbox
-  document.querySelector('#compose-form').addEventListener('submit', event => {
-    event.preventDefault();
-    send_email();
-  });
-}
-
-function send_email() {
-  fetch('/emails', {
-    method: 'POST',
-    body: JSON.stringify({
-      recipients: document.querySelector('#compose-recipients').value,
-      subject: document.querySelector('#compose-subject').value,
-      body: document.querySelector('#compose-body').value.replace(/\n/g, '<br>\n')
+  document.querySelector('#compose-form').addEventListener('submit', (event) => {
+    event.preventDefault()
+    fetch('/emails', {
+      method: 'POST',
+      body: JSON.stringify({
+        recipients: document.querySelector('#compose-recipients').value,
+        subject: document.querySelector('#compose-subject').value,
+        body: document.querySelector('#compose-body').value.replace(/\n/g, '<br>\n')
+      })
     })
-  })
-  .then(response => load_mailbox('sent'));
+    .then(res => load_mailbox('sent'));
+  });
 }
 
 function load_mailbox(mailbox) {
