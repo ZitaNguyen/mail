@@ -15,6 +15,7 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
+  document.querySelector('#display-email-view').style.display = 'none';
 
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
@@ -45,6 +46,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#display-email-view').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -63,6 +65,45 @@ function load_mailbox(mailbox) {
 				</div>
 			`;
 			document.querySelector('#emails-view').append(email_preview);
+      // Email background
+			if (email['read'] === false) {
+				email_preview.style.backgroundColor = '#ffffff';
+			} else {
+				email_preview.style.backgroundColor = ' #ebedef';
+			}
+      // Load email content
+			email_preview.addEventListener('click', event => {
+				event.preventDefault();
+				load_email(email);
+			});
+		})
+	})
+}
+
+function load_email(email) {
+  // Show email content and hide other views
+	document.querySelector('#emails-view').style.display = 'none';
+	document.querySelector('#compose-view').style.display = 'none';
+	document.querySelector('#display-email-view').style.display = 'block';
+
+	// Load email
+	let email_content = document.createElement('div');
+	email_content.innerHTML = `
+		<p><strong>From</strong>:${email['sender']}</p>
+		<p><strong>To</strong>:${email['recipients']}</p>
+		<p><strong>Subject</strong>:${email['subject']}</p>
+		<p><strong>Timestamp</strong>:${email['timestamp']}</p>
+		<hr>
+		<p>${email['body']}</p>
+	`;
+	document.querySelector('#display-email-view').innerHTML = '';
+	document.querySelector('#display-email-view').append(email_content);
+
+  // Mark email as read
+	fetch(`/emails/${email['id']}`, {
+		method: 'PUT',
+		body: JSON.stringify({
+			read: true
 		})
 	})
 }
